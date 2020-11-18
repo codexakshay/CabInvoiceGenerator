@@ -5,7 +5,12 @@ public class InvoiceGenerator {
 	private static final double MIN_COST_PER_KM = 10.0;
 	private static final int COST_PER_TIME = 1;
 	private static final double MINIMUM_FARE = 5.0;
-
+	public final RideRepository rideRepository;
+	
+	public InvoiceGenerator() {
+		this.rideRepository = new RideRepository();
+	}
+	
 	public double calaculateFare(double distance, int time) {
 		double totalFare = distance * MIN_COST_PER_KM + time * COST_PER_TIME;
 		return (totalFare < MINIMUM_FARE) ? MINIMUM_FARE : totalFare;
@@ -18,4 +23,25 @@ public class InvoiceGenerator {
 		}
 		return new InvoiceSummary(rides.length, totalFare);
 	}
+
+	public void addRides(String userId, Ride[] rides) {
+		rideRepository.addRides(userId,rides);
+	}
+
+	public InvoiceSummary getInvoiceSummary(String userId) {
+		return this.calaculateFare(rideRepository.getRides(userId));
+	}
+	
+	/*
+	 * public InvoiceSummary getInvoiceSummary(String userId, Ride... newRides ) {
+	 * ArrayList<Ride> rides = rideRepository.getRides(userId); if(rides != null)
+	 * rides.addAll(Arrays.asList(newRides)); else { rides = new
+	 * ArrayList<>(Arrays.asList(newRides)); rideRepository.put(userId, rides); }
+	 * return getInvoiceSummary(rides.toArray(new Ride[0])); }
+	 * 
+	 * public InvoiceSummary getInvoiceSummary(Ride... rides) { final double[]
+	 * totalFares = {0.0}; Arrays.stream(rides).forEach(ride -> totalFares[0] +=
+	 * this.calaculateFare(ride)); InvoiceSummary invoiceSummary = new
+	 * InvoiceSummary(rides.length, totalFares[0]); return invoiceSummary; }
+	 */
 }
